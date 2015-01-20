@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html class="ui-mobile-rendering">
+<head>
+	<title></title>
+	<meta charset="utf-8" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="css/themes/agendafacil.min.css" />
+	<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+	<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.3.min.css" />
+
+	<link rel="stylesheet" href="css/principal.css" />
+
+	<link rel="stylesheet" href="css/smoothDivScroll.css" />
+	
+	<script type="text/javascript" src="cordova.js"></script>
+	
+	<script src="js/libs/jquery-1.11.1.min.js"></script>
+	<script src="js/libs/jquery.mobile-1.4.3.min.js"></script>
+	
+	<script type="text/javascript" src="jquery.base64.js"></script>	
+	
+	<script type="text/javascript">
+	$(document).ready(function(){
+		$("#btnCalcular").click(function(){
+			var valor = parseFloat($("#valor").val());
+			var juros = parseFloat($("#juros").val());
+			var data = $("#date").val();
+			
+			var d1 = new Date();
+			
+			var d2 = new Date($("#date").val());
+			
+			var meses = 0;
+			
+			var diasUltimoMes = 0;
+			
+			var quantidadeDiasExtra = 0;
+			
+			if(d1.getDate() < (d2.getDate() + 1)){
+				
+				meses = retornaMeses() - 1;
+				
+				quantidadeDiasExtra = (d2.getDate() + 1) - d1.getDate();
+				
+				diasUltimoMes = getDiasUltimoMes(d2, 1);
+				
+			}else if((d2.getDate() + 1) < d1.getDate()){
+				
+				meses = retornaMeses() - 2;
+				
+				diasUltimoMes = getDiasUltimoMes(d2, 2);
+				
+				quantidadeDiasExtra = (d2.getDate() + 1) + diasUltimoMes - d1.getDate();
+				
+			}else if((d2.getDate() + 1) == d1.getDate()){
+				
+				meses = retornaMeses() - 1;
+				
+			}
+			
+			
+			for(i = 0 ; i <= meses; i++){
+				
+				valor += juros / 100 * valor;
+				
+			}
+			
+			if((d2.getDate() + 1) != d1.getDate()){
+			
+				var valorUltimoMes = (juros / 100 * valor) / diasUltimoMes;
+			
+				valor += valorUltimoMes * quantidadeDiasExtra;
+				
+			}
+			
+			$("#valorFinal").val(valor.toFixed(2));
+			
+		});
+	});	
+
+	function getDiasUltimoMes(data, tipo){
+		if(tipo == 1){
+		
+			if(data.getMonth() == 1){
+				return DateDiff.inDays(new Date('01', data.getMonth() - 1, data.getYear() - 1), new Date('01', data.getMonth(), data.getYear())); 
+			}else{
+				return DateDiff.inDays(new Date('01', data.getMonth() - 1, data.getYear()), new Date('01', data.getMonth(), data.getYear())); 
+			}
+			
+		}else{
+		
+			if(data.getMonth() == 12){
+				return DateDiff.inDays(new Date('01', data.getMonth(), data.getYear()), new Date('01', data.getMonth() + 1, data.getYear() + 1)); 
+			}else{
+				return DateDiff.inDays(new Date('01', data.getMonth(), data.getYear()), new Date('01', data.getMonth() + 1, data.getYear())); 
+			}
+			
+			
+		}
+	}
+	
+		function retornaMeses() {
+			
+			var d1 = new Date();
+			
+			var d2 = new Date($("#date").val());
+			
+			return DateDiff.inMonths(d1, d2);
+			
+		}	
+	
+
+	var DateDiff = {
+
+			inDays: function(d1, d2) {
+				var t2 = d2.getTime();
+				var t1 = d1.getTime();
+
+				return parseInt((t2-t1)/(24*3600*1000));
+			},
+
+			inWeeks: function(d1, d2) {
+				var t2 = d2.getTime();
+				var t1 = d1.getTime();
+
+				return parseInt((t2-t1)/(24*3600*1000*7));
+			},
+
+			inMonths: function(d1, d2) {
+				var d1Y = d1.getFullYear();
+				var d2Y = d2.getFullYear();
+				var d1M = d1.getMonth();
+				var d2M = d2.getMonth();
+			
+				return (d2M+12*d2Y)-(d1M+12*d1Y);
+			},
+
+			inYears: function(d1, d2) {
+				return d2.getFullYear()-d1.getFullYear();
+			}
+	}
+	
+	</script>
+	
+</head>
+
+<body>
+    <div data-role="page" id="principal">
+ 
+        <div data-role="header">
+			<h1>Cálculo de Juros</h1>
+        </div>
+ 
+        <div data-role="content">
+			<label for="textinput-6">Valor Cheque:</label>
+			<input type="text" name="valor" id="valor" placeholder="Digite o valor" value="" data-mini="true">
+			<label for="date">Data pagamento:</label>
+			<input type="date" name="date" id="date" value="">
+			<label for="textinput-6">Juros (%):</label>
+			<input type="text" name="juros" id="juros" placeholder="Digite o juros" value="" data-mini="true">
+			<button class="ui-btn" id="btnCalcular">Calcular</button>
+			
+			<input type="text" name="valorFinal" id="valorFinal" value="" data-mini="true" readonly>
+        </div>
+ 
+        <div data-role="footer" data-position="fixed">
+            <h4>
+				2015
+			</h4>
+        </div>
+ 
+    </div>
+</body>
+</html>
